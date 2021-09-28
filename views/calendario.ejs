@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+
+        <p>Adicionar/editar/remover eventos</p>
+        <form id="add-ev" class="manage-ev" action="/calendario" method="post">
+            <select class="act" name="acao">
+                <option value="Adicionar">Adicionar</option>
+                <option value="Editar">Editar</option>
+                <option value="Remover">Remover</option>
+            </select>
+            <p>Descrição: </p><input type="text" name="descr" value=""><br>
+            <p>Dia, mês e ano: </p>
+            <select class="" name="day">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+            <select class="" name="month">
+                <option value="Janeiro">Janeiro</option>
+                <option value="Fevereiro">Fevereiro</option>
+                <option value="Março">Março</option>
+                <option value="Abril">Abril</option>
+                <option value="Maio">Maio</option>
+                <option value="Junho">Junho</option>
+                <option value="Julho">Julho</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Setembro">Setembro</option>
+                <option value="Outubro">Outubro</option>
+                <option value="Novembro">Novembro</option>
+                <option value="Dezembro">Dezembro</option>
+            </select>
+            <select class="" name="year">
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+            </select>
+            <br>
+            <p>Hora de início</p>
+            <select class="" name="inicio_hora">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+            </select>
+            <span>:</span>
+            <select class="" name="inicio_minuto">
+                <option value="00">00</option>
+                <option value="01">10</option>
+                <option value="02">20</option>
+                <option value="03">30</option>
+                <option value="04">40</option>
+                <option value="05">50</option>
+            </select>
+            <br>
+            <p>Hora de término</p>
+            <select class="" name="termino_hora">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+            </select>
+            <span>:</span>
+            <select class="" name="termino_minuto">
+                <option value="00">00</option>
+                <option value="01">10</option>
+                <option value="02">20</option>
+                <option value="03">30</option>
+                <option value="04">40</option>
+                <option value="05">50</option>
+            </select>
+            <br><br>
+            <button type="submit" name="submit-ev">Submeter</button><br><br>
+        </form>
+
+        <h1><%= mname %> de <%= year %></h1>
+        <table>
+            <tr>
+                <th>Domingo</th>
+                <th>Segunda</th>
+                <th>Terça</th>
+                <th>Quarta</th>
+                <th>Quinta</th>
+                <th>Sexta</th>
+                <th>Sábado</th>
+            </tr>
+            <tr id="week1" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week2" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week3" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week4" cla<td></td>
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week5" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+        </table>
+        <br>
+
+        <span id="event-list"></span>
+
+        <script>
+            function days_in_month(month, year)
+            {
+                return new Date(year, month, 0).getDate();
+            }
+
+            function insert_event(mtable, day, e)
+            {
+                var i, hour; // indice de vetor e hora
+
+                var hour_to_num = h => { // converte string de hora para inteiro
+                    var aux = h.split(':');
+                    return parseInt(aux[0], 10)*100 + parseInt(aux[1], 10);
+                };
+
+                hour = hour_to_num(e.inicio);
+
+                for(i = 0; i < mtable[day].length && hour_to_num(mtable[day][i].inicio) < hour; i++);
+
+                mtable[day].splice(i, 0, e);
+            }
+
+            function month_table(month, year, events)
+            {
+                var mtable = [];
+                var ndays = days_in_month(month, year);
+                for(var d = 0; d <= ndays; d++)
+                    mtable.push([]);
+
+                for(var e = 0; e < events.length; e++)
+                {
+                    var day = parseInt(events[e].dia, 10);
+                    insert_event(mtable, day, events[e]);
+                }
+
+                return mtable;
+            }
+
+            function day_name(day){
+                switch(day){
+                    case 0: return 'sun';
+                    case 1: return 'mon';
+                    case 2: return 'tue';
+                    case 3: return 'wed';
+                    case 4: return 'thu';
+                    case 5: return 'fri';
+                    case 6: return 'sat';
+                    default: break;
+                }
+            }
+
+
+            function show_month_table(mtable, month, year)
+            {
+                var firstwd = new Date(year, month-1, 1).getDay(); // primeiro dia do mes
+                var lastmday = new Date(year, month, 0).getDate(); // ultimo dia do mes
+                var day = 1;
+                var auxString = '';
+
+                for(var d = firstwd; d < 7; d++)
+                {
+                    auxString = 'onclick="show_day_events(mtable,' + day.toString() + ')"';
+                    document.getElementsByClassName(day_name(d))[0].innerHTML =
+                        '<button ' + auxString + '>' + (day++).toString() + '</button>';
+                }
+
+                for(var w = 1; w < 5; w++)
+                {
+                    for(var d = 0; d < 7 && day <= lastmday; d++)
+                    {
+                        auxString = 'onclick="show_day_events(mtable,' + day.toString() + ')"';
+                        document.getElementsByClassName(day_name(d))[w].innerHTML =
+                            '<button ' + auxString + '>' + (day++).toString() + '</button>';
+                    }
+                }
+            }
+
+            function show_day_events(mtable, day)
+            {
+                document.getElementById('event-list').innerHTML = '<ul>';
+                for(var i = 0; i < mtable[day].length; i++)
+                    document.getElementById('event-list').innerHTML +=
+                        '<li>' +
+                        'Evento: ' + mtable[day][i].descr +
+                        ' -----> Início: ' + mtable[day][i].inicio +
+                        ' -----> Término: ' + mtable[day][i].termino +
+                        '</li>';
+                document.getElementById('event-list').innerHTML += '</ul>';
+            }
+
+            // dados recebidos do servidor
+            var data = '<%- data %>';
+            var m = parseInt('<%- month %>', 10);
+            var y = parseInt('<%- year %>', 10);
+
+            data = JSON.parse(data); // converte em objeto de javascript
+            var mtable = month_table(m, y, data);
+
+            show_month_table(mtable, m, y);
+
+        </script>
+    </body>
+</html>
