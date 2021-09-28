@@ -1,3 +1,9 @@
+/*
+    AUTOR: RAFAEL MELIANI VELLOSO
+    PROJETO: DESAFIO DA EMPRESA TOKENLAB PARA VAGA DE ESTÁGIO.
+    DESCRIÇÃO: PEQUENA APLICAÇÃO PARA GERENCIAMENTO DE EVENTOS.
+*/
+
 const express = require('express');
 const bodyparser = require('body-parser');
 const mysql = require('mysql');
