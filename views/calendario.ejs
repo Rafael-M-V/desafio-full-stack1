@@ -149,7 +149,7 @@
                 <option value="05">50</option>
             </select>
             <br><br>
-            <button type="submit" name="submit-ev">Submeter</button><br><br>
+            <button type="submit" name="user" value="<%= user %>">Submeter</button><br><br>
         </form>
 
         <h1><%= mname %> de <%= year %></h1>
@@ -292,7 +292,8 @@
 
             function show_day_events(mtable, day)
             {
-                document.getElementById('event-list').innerHTML = '<ul>';
+                document.getElementById('event-list').innerHTML = '<h2>Eventos do dia ' + day + '</h2>';
+                document.getElementById('event-list').innerHTML += '<ul>';
                 for(var i = 0; i < mtable[day].length; i++)
                     document.getElementById('event-list').innerHTML +=
                         '<li>' +

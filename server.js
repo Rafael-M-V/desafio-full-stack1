@@ -4,77 +4,25 @@ const mysql = require('mysql');
 
 const app = express();
 
-
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '*****',
+    password: 'mysqlpasswd',
     database: 'db',
     multipleStatements: true
 });
 
-function check_for_user(data)
-{
-    con.connect(err =>{
-        con.query("SELECT * FROM users WHERE BINARY (name=? OR email=?) AND passw=?",
-        [data.user, data.user, data.passw],
-        (err, result) => {
-            exists = (result != undefined);
-        });
-    });
+
+/* Funções auxiliares */
+
+/* Deixa mes ou dia no formato esperado, ou seja, com dois digitos */
+function set_month_day(m){
+    if(m.length === 1)
+        return '0' + m;
+    return m;
 }
 
-
-/* COISAS TEMPORARIAS QUE SERAO SUBSTITUIDAS DEPOIS */
-var db = []; // temporary "data base" for users
-var events = {} // temporary "data base" for events
-
-db.push(
-    {
-        name: 'r',
-        email: 'r@',
-        passw: '123'
-    }
-);
-
-events[{8:2021}] = [{
-        dia: '9',
-        descr: 'procissao',
-        inicio: '14:30',
-        termino: '15:30'
-    }];
-
-events[{8:2021}].push({dia:'1', descr:'vigilia', inicio:'00:00', termino:'05:00'});
-events[{8:2021}].push({dia:'1', descr:'missa', inicio:'16:00', termino:'17:00'});
-events[{8:2021}].push({dia:'1', descr:'missa', inicio:'13:00', termino:'14:00'});
-events[{8:2021}].push({dia:'1', descr:'missa', inicio:'08:00', termino:'09:00'});
-
-// funcao temporaria que verifica se usuario existe na 'base de dados'
-function check_for_user_old(user_data)
-{
-    for(var i = 0; i < db.length; i++)
-        if((db[i].name === user_data.user || db[i].email === user_data.user) &&
-            db[i].passw === user_data.passw)
-
-            return true;
-
-    return false;
-}
-
-function getEvents(month, year)
-{
-    con.query("SELECT * FROM events WHERE mes=? AND ano=?",
-    [month, year],
-    (err, result) => {
-        if(err)
-            throw err;
-        r = result;
-    });
-}
-
-
-/*****************************************************/
-
+/* Converte numero do mes em nome do mes */
 function month_name(month)
 {
     switch (month)
@@ -95,6 +43,7 @@ function month_name(month)
     }
 }
 
+/* Converte nome do mes em numero do mes */
 function month_number(month)
 {
     if(month === 'Janeiro') return '01';
@@ -113,24 +62,26 @@ function month_number(month)
     return '';
 }
 
-
-
 app.use(bodyparser.urlencoded({extended: false}));
 app.use(bodyparser.json());
 
 app.set('view-engine', 'ejs');
 
 /* GET */
+
+/* home */
 app.get('/', (req, res) => {
     res.render('home.ejs');
     res.end();
 });
 
+/* Pagina de cadastro */
 app.get('/cadastro', (req, res) => {
     res.render('cadastro.ejs');
     res.end();
 });
 
+/* Pagina de calendario (nao pode ser acessada diretamente) */
 app.get('/calendario', (req, res) => {
     res.end();
 });
@@ -138,43 +89,43 @@ app.get('/calendario', (req, res) => {
 
 /* POST */
 
-function set_month_day(m){
-    if(m.length === 1)
-        return '0' + m;
-    return m;
-}
-
+/* Recebe login de usuario */
 app.post('/', (req, res) => {
 
     var user_data = {
-        user: req.body.user,
-        passw: req.body.passw
+        user: req.body.user, // usuario
+        passw: req.body.passw // senha
     };
 
+    // data atual
     var date = {
         dia: set_month_day(new Date().getDate().toString()),
         mes: set_month_day(((new Date().getMonth())+1).toString()),
         ano: new Date().getFullYear().toString()
     };
 
-    con.query("SELECT * FROM users WHERE BINARY (name=? OR email=?) AND passw=?;\
-               SELECT * FROM events WHERE mes=? AND ano=?",
-    [user_data.user, user_data.user, user_data.passw, date.mes, date.ano],
+    // Procura algum usuario na base de dados que corresponde com o que foi digitado.
+    // Procura eventos na base de dados que pertencem ao mes e ano atuais
+    con.query("SELECT * FROM users WHERE BINARY email=? AND passw=?;\
+               SELECT descr, dia, mes, ano, inicio, termino FROM events WHERE mes=? AND ano=?",
+    [user_data.user, user_data.passw, date.mes, date.ano],
     (err, result) => {
         if(err)
             throw err;
 
-        if(result[0].length != 0)
+        if(result[0].length != 0) // se usuario existe na base de dados...
         {
+            // carrega calendario
             res.render('calendario.ejs',
             {
-                data: JSON.stringify(result[1]),
-                month: date.mes,
-                year: date.ano,
-                mname: month_name(parseInt(date.mes, 10)-1)
+                data: JSON.stringify(result[1]), // eventos
+                user: user_data.user, // usuario
+                month: date.mes, // mes atual
+                year: date.ano, // ano atual
+                mname: month_name(parseInt(date.mes, 10)-1) // nome do mes
             });
         }
-        else
+        else // redireciona para pagina home
         {
             res.redirect('/');
         }
@@ -183,22 +134,26 @@ app.post('/', (req, res) => {
     });
 });
 
+/* Recebe cadastro de usuario */
 app.post('/cadastro', (req, res) => {
     var data = {
-        name: req.body.name,
-        email: req.body.email,
-        passw: req.body.passw
+        name: req.body.name, // nome
+        email: req.body.email, // email
+        passw: req.body.passw // senha
     };
 
     con.connect((err) => {
         if(err)
             throw err;
 
+        // verifica se email ja esta cadastrado na base de dados
         con.query("SELECT * FROM users WHERE BINARY email=?", [data.email], (err, result, fields) => {
             if(err)
                 throw err;
 
-            if(result.length === 0){
+            if(result.length === 0) // se email nao esta cadastrado...
+            {
+                // insere novo usuario na base de dados
                 con.query("INSERT INTO users (name, email, passw) VALUES(?,?,?)",
                 [data.name, data.email, data.passw],
                 (err, result) => {
@@ -214,27 +169,24 @@ app.post('/cadastro', (req, res) => {
     res.end();
 });
 
-
+/* Adicionar, remover ou editar eventos */
 app.post('/calendario', (req, res) => {
 
     var data = {
-        descr: req.body.descr,
-        dia: req.body.day,
-        mes: month_number(req.body.month),
-        ano: req.body.year,
-        inicio: req.body.inicio_hora + ':' + req.body.inicio_minuto,
-        termino: req.body.termino_hora + ':' + req.body.termino_minuto
+        descr: req.body.descr, // descricao
+        dia: req.body.day, // dia
+        mes: month_number(req.body.month), // mes
+        ano: req.body.year, // ano
+        inicio: req.body.inicio_hora + ':' + req.body.inicio_minuto, // hora de inicio
+        termino: req.body.termino_hora + ':' + req.body.termino_minuto, // hora de termino
+        user: req.body.user // usuario que fez a operacao
     };
 
-    console.log(req.body.acao);
-
-    if(req.body.acao == 'Adicionar')
+    if(req.body.acao == 'Adicionar') // se usuario quis adicionar evento...
     {
-        // adicionar evento na base de dados e dar refresh na pagina do usuario
-
-
-        con.query("INSERT INTO events (descr, dia, mes, ano, inicio, termino) VALUES(?,?,?,?,?,?)",
-        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino],
+        // insere novo evento na base de dados
+        con.query("INSERT INTO events (descr, dia, mes, ano, inicio, termino, user) VALUES(?,?,?,?,?,?,?)",
+        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.user],
         (err) => {
             if(err)
                 throw err;
@@ -245,10 +197,11 @@ app.post('/calendario', (req, res) => {
     {
         // to do
     }
-    else if(req.body.acao == 'Remover')
+    else if(req.body.acao == 'Remover') // se usuario quis remover evento...
     {
-        con.query("DELETE FROM events WHERE descr=? AND dia=? AND mes=? AND ano=? AND inicio=? AND termino=?",
-        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino],
+        //
+        con.query("DELETE FROM events WHERE descr=? AND dia=? AND mes=? AND ano=? AND inicio=? AND termino=? AND user=?",
+        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.user],
         (err) => {
             if(err)
                 throw err;
@@ -260,3 +213,82 @@ app.post('/calendario', (req, res) => {
 });
 
 app.listen(3000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function check_for_user(data)
+// {
+//     con.connect(err =>{
+//         con.query("SELECT * FROM users WHERE BINARY (name=? OR email=?) AND passw=?",
+//         [data.user, data.user, data.passw],
+//         (err, result) => {
+//             exists = (result != undefined);
+//         });
+//     });
+// }
+//
+//
+// /* COISAS TEMPORARIAS QUE SERAO SUBSTITUIDAS DEPOIS */
+// var db = []; // temporary "data base" for users
+// var events = {} // temporary "data base" for events
+//
+// db.push(
+//     {
+//         name: 'r',
+//         email: 'r@',
+//         passw: '123'
+//     }
+// );
+//
+// events[{8:2021}] = [{
+//         dia: '9',
+//         descr: 'procissao',
+//         inicio: '14:30',
+//         termino: '15:30'
+//     }];
+//
+// events[{8:2021}].push({dia:'1', descr:'vigilia', inicio:'00:00', termino:'05:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'16:00', termino:'17:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'13:00', termino:'14:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'08:00', termino:'09:00'});
+//
+// // funcao temporaria que verifica se usuario existe na 'base de dados'
+// function check_for_user_old(user_data)
+// {
+//     for(var i = 0; i < db.length; i++)
+//         if((db[i].name === user_data.user || db[i].email === user_data.user) &&
+//             db[i].passw === user_data.passw)
+//
+//             return true;
+//
+//     return false;
+// }
+//
+// function getEvents(month, year)
+// {
+//     con.query("SELECT * FROM events WHERE mes=? AND ano=?",
+//     [month, year],
+//     (err, result) => {
+//         if(err)
+//             throw err;
+//         r = result;
+//     });
+// }
