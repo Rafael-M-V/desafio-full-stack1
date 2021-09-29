@@ -5,8 +5,10 @@
         <title>Calendário de eventos</title>
     </head>
     <body>
-
+        <!-- Mes e ano -->
         <h1><%= mname %> de <%= year %></h1>
+        
+        <!-- Tabela do mes -->
         <table>
             <tr>
                 <th>Domingo</th>
@@ -65,12 +67,15 @@
         </table>
         <br>
 
+        <!-- Lista de eventos do dia que o usuario clicou -->
         <span id="event-list"></span>
 
         <h2>Seus eventos</h2>
 
+        <!-- Lista de eventos que o usuario criou -->
         <span id="user_events"></span>
 
+        <!-- Opcao de adicionar um evento novo ou remover um evento existente -->
         <h2>Adicionar/remover eventos</h2>
         <form id="add-ev" class="manage-ev" action="/calendario" method="post">
             <select class="act" name="acao">
@@ -206,11 +211,11 @@
             <span>:</span>
             <select class="" name="termino_minuto">
                 <option value="00">00</option>
-                <option value="01">10</option>
-                <option value="02">20</option>
-                <option value="03">30</option>
-                <option value="04">40</option>
-                <option value="05">50</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
             </select>
             <br><br>
             <p>Email: </p><input type="email" name="email" value=""><br>
@@ -220,11 +225,13 @@
 
         <script>
 
+            /* Funcao auxiliar que retorna a quantidade de dias do mes 'month' no ano 'year' */
             function days_in_month(month, year)
             {
                 return new Date(year, month, 0).getDate();
             }
 
+            /* Funcao que insere no dia 'day' da tabela de mes 'mtable' um evento 'e' de forma ordenada */
             function insert_event(mtable, day, e)
             {
                 var i, hour; // indice de vetor e hora
@@ -241,22 +248,26 @@
                 mtable[day].splice(i, 0, e);
             }
 
+            /* Cria matriz representando uma tabela do mes em que cada dia
+                contem seus respectivos eventos */
             function month_table(month, year, events)
             {
-                var mtable = [];
-                var ndays = days_in_month(month, year);
-                for(var d = 0; d <= ndays; d++)
+                var mtable = []; // cria vetor vazio
+                var ndays = days_in_month(month, year); // numero de dias no mes
+
+                for(var d = 0; d <= ndays; d++) // cria subvetores representando os dias
                     mtable.push([]);
 
                 for(var e = 0; e < events.length; e++)
                 {
-                    var day = parseInt(events[e].dia, 10);
-                    insert_event(mtable, day, events[e]);
+                    var day = parseInt(events[e].dia, 10); // converte string em inteiro para ajudar na ordemacao
+                    insert_event(mtable, day, events[e]); // insere eventos de forma ordenada
                 }
 
                 return mtable;
             }
 
+            /* Funcao auxiliar que converte numero do dia da semana em string */
             function day_name(day){
                 switch(day){
                     case 0: return 'sun';
@@ -270,7 +281,7 @@
                 }
             }
 
-
+            /* Mostra tabela do mes */
             function show_month_table(mtable, month, year)
             {
                 var firstwd = new Date(year, month-1, 1).getDay(); // primeiro dia do mes
@@ -278,6 +289,7 @@
                 var day = 1;
                 var auxString = '';
 
+                // cria um botao para cada dia da primeira semana
                 for(var d = firstwd; d < 7; d++)
                 {
                     auxString = 'onclick="show_day_events(mtable,' + day.toString() + ')"';
@@ -285,6 +297,7 @@
                         '<button ' + auxString + '>' + (day++).toString() + '</button>';
                 }
 
+                // cria um botao para cada dia do resto do mes
                 for(var w = 1; w < 5; w++)
                 {
                     for(var d = 0; d < 7 && day <= lastmday; d++)
@@ -296,8 +309,10 @@
                 }
             }
 
+            /* Mostra eventos que o usuário criou */
             function show_user_events(user_data)
             {
+                // cria lista
                 document.getElementById('user_events').innerHTML = '<ul>';
                 for(var i = 0; i < user_data.length; i++)
                 {
@@ -305,28 +320,28 @@
                         '<li>' +
                         '<form class="" action="/calendario" method="post">' +
 
-                        '<input style="width: 100px" type="text" name="descr" value="' +
+                        '<input style="width: 100px" type="text" name="descr" value="' + // descricao do evento
                         user_data[i].descr + '">' +
 
-                        ' Dia: <input style="width: 50px" type="text" name="day" value="' +
+                        ' Dia: <input style="width: 50px" type="text" name="day" value="' + // dia do evento
                         user_data[i].dia +'">' +
 
-                        ' Mês: <input style="width: 50px" type="text" name="month" value="' +
+                        ' Mês: <input style="width: 50px" type="text" name="month" value="' + // mes do evento
                         user_data[i].mes +'">' +
 
-                        ' Ano: <input style="width: 50px" type="text" name="year" value="' +
+                        ' Ano: <input style="width: 50px" type="text" name="year" value="' + // ano do evento
                         user_data[i].ano + '">' +
 
-                        ' Início: <input style="width: 50px" type="text" name="inicio" value="' +
+                        ' Início: <input style="width: 50px" type="text" name="inicio" value="' + // hora de inicio
                         user_data[i].inicio + '">' +
 
-                        ' Término: <input style="width: 50px" type="text" name="termino" value="' +
+                        ' Término: <input style="width: 50px" type="text" name="termino" value="' + // hora de termino
                         user_data[i].termino + '">' +
 
-                        ' Email: <input style="width: 100px" type="text" name="email">' +
-                        ' Senha: <input style="width: 100px" type="password" name="passw">' +
+                        ' Email: <input style="width: 100px" type="text" name="email">' + // email
+                        ' Senha: <input style="width: 100px" type="password" name="passw">' + // senha
 
-
+                        // botao que da a opcao de editar o evento
                         ' <button type="submit" value="Editar' + i.toString() + '" name="acao">Editar</button>' +
                         '</form>' +
                         '</li>';
@@ -334,6 +349,7 @@
                 document.getElementById('user_events').innerHTML += '</ul>';
             }
 
+            /* Mostra eventos do dia selecionado */
             function show_day_events(mtable, day)
             {
                 document.getElementById('event-list').innerHTML = '<h2>Eventos do dia ' + day + '</h2>';
@@ -356,12 +372,10 @@
 
             data = JSON.parse(data); // converte em objeto de javascript
             user_data = JSON.parse(user_data); // converte em objeto de javascript
-            var mtable = month_table(m, y, data);
+            var mtable = month_table(m, y, data); // contrói tabela do mês
 
-            show_user_events(user_data);
-            show_month_table(mtable, m, y);
-
-
+            show_user_events(user_data); // mostra eventos do usuário
+            show_month_table(mtable, m, y); // mostra tabela do mês
 
         </script>
     </body>
