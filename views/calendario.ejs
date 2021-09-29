@@ -2,15 +2,79 @@
 <html lang="en" dir="ltr">
     <head>
         <meta charset="utf-8">
-        <title></title>
+        <title>Calendário de eventos</title>
     </head>
     <body>
 
-        <p>Adicionar/editar/remover eventos</p>
+        <h1><%= mname %> de <%= year %></h1>
+        <table>
+            <tr>
+                <th>Domingo</th>
+                <th>Segunda</th>
+                <th>Terça</th>
+                <th>Quarta</th>
+                <th>Quinta</th>
+                <th>Sexta</th>
+                <th>Sábado</th>
+            </tr>
+            <tr id="week1" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week2" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week3" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week4" cla<td></td>
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+            <tr id="week5" class="week">
+                <td class="sun"></td>
+                <td class="mon"></td>
+                <td class="tue"></td>
+                <td class="wed"></td>
+                <td class="thu"></td>
+                <td class="fri"></td>
+                <td class="sat"></td>
+            </tr>
+        </table>
+        <br>
+
+        <span id="event-list"></span>
+
+        <h2>Seus eventos</h2>
+
+        <span id="user_events"></span>
+
+        <h2>Adicionar/remover eventos</h2>
         <form id="add-ev" class="manage-ev" action="/calendario" method="post">
             <select class="act" name="acao">
                 <option value="Adicionar">Adicionar</option>
-                <option value="Editar">Editar</option>
                 <option value="Remover">Remover</option>
             </select>
             <p>Descrição: </p><input type="text" name="descr" value=""><br>
@@ -149,71 +213,13 @@
                 <option value="05">50</option>
             </select>
             <br><br>
-            <button type="submit" name="user" value="<%= user %>">Submeter</button><br><br>
+            <p>Email: </p><input type="email" name="email" value=""><br>
+            <p>Senha: </p><input type="password" name="passw" value=""><br><br>
+            <button type="submit" name="">Submeter</button><br><br>
         </form>
 
-        <h1><%= mname %> de <%= year %></h1>
-        <table>
-            <tr>
-                <th>Domingo</th>
-                <th>Segunda</th>
-                <th>Terça</th>
-                <th>Quarta</th>
-                <th>Quinta</th>
-                <th>Sexta</th>
-                <th>Sábado</th>
-            </tr>
-            <tr id="week1" class="week">
-                <td class="sun"></td>
-                <td class="mon"></td>
-                <td class="tue"></td>
-                <td class="wed"></td>
-                <td class="thu"></td>
-                <td class="fri"></td>
-                <td class="sat"></td>
-            </tr>
-            <tr id="week2" class="week">
-                <td class="sun"></td>
-                <td class="mon"></td>
-                <td class="tue"></td>
-                <td class="wed"></td>
-                <td class="thu"></td>
-                <td class="fri"></td>
-                <td class="sat"></td>
-            </tr>
-            <tr id="week3" class="week">
-                <td class="sun"></td>
-                <td class="mon"></td>
-                <td class="tue"></td>
-                <td class="wed"></td>
-                <td class="thu"></td>
-                <td class="fri"></td>
-                <td class="sat"></td>
-            </tr>
-            <tr id="week4" cla<td></td>
-                <td class="sun"></td>
-                <td class="mon"></td>
-                <td class="tue"></td>
-                <td class="wed"></td>
-                <td class="thu"></td>
-                <td class="fri"></td>
-                <td class="sat"></td>
-            </tr>
-            <tr id="week5" class="week">
-                <td class="sun"></td>
-                <td class="mon"></td>
-                <td class="tue"></td>
-                <td class="wed"></td>
-                <td class="thu"></td>
-                <td class="fri"></td>
-                <td class="sat"></td>
-            </tr>
-        </table>
-        <br>
-
-        <span id="event-list"></span>
-
         <script>
+
             function days_in_month(month, year)
             {
                 return new Date(year, month, 0).getDate();
@@ -290,6 +296,44 @@
                 }
             }
 
+            function show_user_events(user_data)
+            {
+                document.getElementById('user_events').innerHTML = '<ul>';
+                for(var i = 0; i < user_data.length; i++)
+                {
+                    document.getElementById('user_events').innerHTML +=
+                        '<li>' +
+                        '<form class="" action="/calendario" method="post">' +
+
+                        '<input style="width: 100px" type="text" name="descr" value="' +
+                        user_data[i].descr + '">' +
+
+                        ' Dia: <input style="width: 50px" type="text" name="day" value="' +
+                        user_data[i].dia +'">' +
+
+                        ' Mês: <input style="width: 50px" type="text" name="month" value="' +
+                        user_data[i].mes +'">' +
+
+                        ' Ano: <input style="width: 50px" type="text" name="year" value="' +
+                        user_data[i].ano + '">' +
+
+                        ' Início: <input style="width: 50px" type="text" name="inicio" value="' +
+                        user_data[i].inicio + '">' +
+
+                        ' Término: <input style="width: 50px" type="text" name="termino" value="' +
+                        user_data[i].termino + '">' +
+
+                        ' Email: <input style="width: 100px" type="text" name="email">' +
+                        ' Senha: <input style="width: 100px" type="password" name="passw">' +
+
+
+                        ' <button type="submit" value="Editar' + i.toString() + '" name="acao">Editar</button>' +
+                        '</form>' +
+                        '</li>';
+                }
+                document.getElementById('user_events').innerHTML += '</ul>';
+            }
+
             function show_day_events(mtable, day)
             {
                 document.getElementById('event-list').innerHTML = '<h2>Eventos do dia ' + day + '</h2>';
@@ -306,13 +350,18 @@
 
             // dados recebidos do servidor
             var data = '<%- data %>';
+            var user_data = '<%- user_data %>';
             var m = parseInt('<%- month %>', 10);
             var y = parseInt('<%- year %>', 10);
 
             data = JSON.parse(data); // converte em objeto de javascript
+            user_data = JSON.parse(user_data); // converte em objeto de javascript
             var mtable = month_table(m, y, data);
 
+            show_user_events(user_data);
             show_month_table(mtable, m, y);
+
+
 
         </script>
     </body>

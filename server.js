@@ -1,9 +1,3 @@
-/*
-    AUTOR: RAFAEL MELIANI VELLOSO
-    PROJETO: DESAFIO DA EMPRESA TOKENLAB PARA VAGA DE ESTÁGIO.
-    DESCRIÇÃO: PEQUENA APLICAÇÃO PARA GERENCIAMENTO DE EVENTOS.
-*/
-
 const express = require('express');
 const bodyparser = require('body-parser');
 const mysql = require('mysql');
@@ -13,7 +7,7 @@ const app = express();
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '*****',
+    password: '****',
     database: 'db',
     multipleStatements: true
 });
@@ -113,8 +107,9 @@ app.post('/', (req, res) => {
     // Procura algum usuario na base de dados que corresponde com o que foi digitado.
     // Procura eventos na base de dados que pertencem ao mes e ano atuais
     con.query("SELECT * FROM users WHERE BINARY email=? AND passw=?;\
-               SELECT descr, dia, mes, ano, inicio, termino FROM events WHERE mes=? AND ano=?",
-    [user_data.user, user_data.passw, date.mes, date.ano],
+               SELECT descr, dia, mes, ano, inicio, termino FROM events WHERE mes=? AND ano=?;\
+               SELECT descr, dia, mes, ano, inicio, termino FROM events WHERE user=?",
+    [user_data.user, user_data.passw, date.mes, date.ano, user_data.user],
     (err, result) => {
         if(err)
             throw err;
@@ -122,9 +117,11 @@ app.post('/', (req, res) => {
         if(result[0].length != 0) // se usuario existe na base de dados...
         {
             // carrega calendario
+            console.log(result[2]);
             res.render('calendario.ejs',
             {
                 data: JSON.stringify(result[1]), // eventos
+                user_data: JSON.stringify(result[2]), // eventos
                 user: user_data.user, // usuario
                 month: date.mes, // mes atual
                 year: date.ano, // ano atual
@@ -175,42 +172,130 @@ app.post('/cadastro', (req, res) => {
     res.end();
 });
 
+
+function get_event_number(acao)
+{
+    var i = 0;
+    var dec = 1;
+
+    for(l = acao.length-1; l >= 6; l--)
+    {
+        i += parseInt(acao[l], 10) * dec;
+        dec *= 10;
+    }
+
+    return i;
+}
+
+
 /* Adicionar, remover ou editar eventos */
 app.post('/calendario', (req, res) => {
 
-    var data = {
-        descr: req.body.descr, // descricao
-        dia: req.body.day, // dia
-        mes: month_number(req.body.month), // mes
-        ano: req.body.year, // ano
-        inicio: req.body.inicio_hora + ':' + req.body.inicio_minuto, // hora de inicio
-        termino: req.body.termino_hora + ':' + req.body.termino_minuto, // hora de termino
-        user: req.body.user // usuario que fez a operacao
-    };
+    var data;
+
 
     if(req.body.acao == 'Adicionar') // se usuario quis adicionar evento...
     {
+        data = {
+            descr: req.body.descr, // descricao
+            dia: req.body.day, // dia
+            mes: month_number(req.body.month), // mes
+            ano: req.body.year, // ano
+            inicio: req.body.inicio_hora + ':' + req.body.inicio_minuto, // hora de inicio
+            termino: req.body.termino_hora + ':' + req.body.termino_minuto, // hora de termino
+            email: req.body.email, // usuario que fez a operacao
+            passw: req.body.passw // senha do usuario que fez a operacao
+        };
         // insere novo evento na base de dados
-        con.query("INSERT INTO events (descr, dia, mes, ano, inicio, termino, user) VALUES(?,?,?,?,?,?,?)",
-        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.user],
-        (err) => {
-            if(err)
-                throw err;
+        con.query("SELECT * FROM users WHERE email=? AND passw=?", // autenticacao do usuario
+        [data.email, data.passw],
+        (err, result) => {
+            if(result.length != 0)
+            {
+                // insercao do evento
+                con.query("INSERT INTO events (descr, dia, mes, ano, inicio, termino, user) VALUES(?,?,?,?,?,?,?)",
+                [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.email],
+                (err) => {
+                    if(err)
+                        throw err;
+                });
+            }
         });
 
     }
-    else if(req.body.acao == 'Editar')
+    else if(req.body.acao.includes('Editar', 0))
     {
-        // to do
+
+        data = {
+            descr: req.body.descr, // descricao
+            dia: req.body.day, // dia
+            mes: req.body.month, // mes
+            ano: req.body.year, // ano
+            inicio: req.body.inicio, // hora de inicio
+            termino: req.body.termino, // hora de termino
+            email: req.body.email, // usuario que fez a operacao
+            passw: req.body.passw // senha do usuario que fez a operacao
+        };
+
+        con.query("SELECT * FROM users WHERE email=? AND passw=?;\
+                   SELECT * FROM events WHERE user=?;",
+        [data.email, data.passw, data.email],
+        (err, result) => {
+            if(err)
+                throw err;
+
+            if(result[0].length != 0)
+            {
+
+                if(1)
+                {
+                    console.log(result[1]);
+                    var i = get_event_number(req.body.acao);
+                    con.query("DELETE FROM events WHERE descr=? AND dia=? AND mes=? AND ano=? AND inicio=? AND termino=? AND user=?;\
+                    INSERT INTO events (descr, dia, mes, ano, inicio, termino, user) VALUES(?,?,?,?,?,?,?)",
+                    [result[1][i].descr, result[1][i].dia, result[1][i].mes, result[1][i].ano, result[1][i].inicio,
+                    result[1][i].termino, result[1][i].user,
+                    data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.email],
+                    (err) => {
+                        if(err)
+                        throw err;
+                    });
+                }
+            }
+        });
+
+
+        var i = parseInt(req.body.acao[6], 10);
     }
     else if(req.body.acao == 'Remover') // se usuario quis remover evento...
     {
-        //
-        con.query("DELETE FROM events WHERE descr=? AND dia=? AND mes=? AND ano=? AND inicio=? AND termino=? AND user=?",
-        [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.user],
-        (err) => {
+        data = {
+            descr: req.body.descr, // descricao
+            dia: req.body.day, // dia
+            mes: month_number(req.body.month), // mes
+            ano: req.body.year, // ano
+            inicio: req.body.inicio_hora + ':' + req.body.inicio_minuto, // hora de inicio
+            termino: req.body.termino_hora + ':' + req.body.termino_minuto, // hora de termino
+            email: req.body.email, // usuario que fez a operacao
+            passw: req.body.passw // senha do usuario que fez a operacao
+        };
+
+        con.query("SELECT * FROM users WHERE email=? AND passw=?", // autenticacao do usuario
+        [data.email, data.passw],
+        (err, result) => {
             if(err)
                 throw err;
+
+            if(result.length != 0)
+            {
+                // remove evento da base de dados
+                con.query("DELETE FROM events WHERE descr=? AND dia=? AND mes=? AND ano=? AND inicio=? AND termino=? AND user=?",
+                [data.descr, data.dia, data.mes, data.ano, data.inicio, data.termino, data.email],
+                (err) => {
+                    if(err)
+                    throw err;
+                });
+            }
         });
     }
 
@@ -219,3 +304,82 @@ app.post('/calendario', (req, res) => {
 });
 
 app.listen(3000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function check_for_user(data)
+// {
+//     con.connect(err =>{
+//         con.query("SELECT * FROM users WHERE BINARY (name=? OR email=?) AND passw=?",
+//         [data.user, data.user, data.passw],
+//         (err, result) => {
+//             exists = (result != undefined);
+//         });
+//     });
+// }
+//
+//
+// /* COISAS TEMPORARIAS QUE SERAO SUBSTITUIDAS DEPOIS */
+// var db = []; // temporary "data base" for users
+// var events = {} // temporary "data base" for events
+//
+// db.push(
+//     {
+//         name: 'r',
+//         email: 'r@',
+//         passw: '123'
+//     }
+// );
+//
+// events[{8:2021}] = [{
+//         dia: '9',
+//         descr: 'procissao',
+//         inicio: '14:30',
+//         termino: '15:30'
+//     }];
+//
+// events[{8:2021}].push({dia:'1', descr:'vigilia', inicio:'00:00', termino:'05:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'16:00', termino:'17:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'13:00', termino:'14:00'});
+// events[{8:2021}].push({dia:'1', descr:'missa', inicio:'08:00', termino:'09:00'});
+//
+// // funcao temporaria que verifica se usuario existe na 'base de dados'
+// function check_for_user_old(user_data)
+// {
+//     for(var i = 0; i < db.length; i++)
+//         if((db[i].name === user_data.user || db[i].email === user_data.user) &&
+//             db[i].passw === user_data.passw)
+//
+//             return true;
+//
+//     return false;
+// }
+//
+// function getEvents(month, year)
+// {
+//     con.query("SELECT * FROM events WHERE mes=? AND ano=?",
+//     [month, year],
+//     (err, result) => {
+//         if(err)
+//             throw err;
+//         r = result;
+//     });
+// }
