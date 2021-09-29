@@ -7,7 +7,7 @@ const app = express();
 var con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '****',
+    password: '*****',
     database: 'db',
     multipleStatements: true
 });
@@ -117,7 +117,6 @@ app.post('/', (req, res) => {
         if(result[0].length != 0) // se usuario existe na base de dados...
         {
             // carrega calendario
-            console.log(result[2]);
             res.render('calendario.ejs',
             {
                 data: JSON.stringify(result[1]), // eventos
@@ -304,3 +303,4 @@ app.post('/calendario', (req, res) => {
 });
 
 app.listen(3000);
+
