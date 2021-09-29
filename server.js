@@ -1,3 +1,9 @@
+/*
+    RAFAEL MELIANI VELLOSO
+    PROJETO: DESAFIO PARA VAGA DE ESTAGIO NA EMPRESA TOKENLAB
+    DESCRICAO: UM PEQUENO SERVICO DE ADMINISTRACAO DE EVENTOS
+*/
+
 const express = require('express');
 const bodyparser = require('body-parser');
 const mysql = require('mysql');
