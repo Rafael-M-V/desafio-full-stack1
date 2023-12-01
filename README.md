@@ -1,2 +1,2 @@
-# desafio-tokenlab
-Desafio para vaga de estágio da empresa Tokenlab.
+# Desafio Full Stack
+Desafio de implementação full stack.
